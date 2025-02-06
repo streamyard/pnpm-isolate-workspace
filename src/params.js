@@ -1,30 +1,7 @@
 const path = require('path');
 const fs = require('fs');
-const yaml = require('yaml');
 
 const { findWorkspacePackages } = require('@pnpm/workspace.find-packages');
-
-async function getWorkspacePatterns(workspaceRoot) {
-  const workspaceFilePath = path.join(workspaceRoot, 'pnpm-workspace.yaml');
-
-  try {
-    const fileContent = fs.readFileSync(workspaceFilePath, { encoding: 'utf-8' });
-    const { packages } = yaml.parse(fileContent);
-
-    if (!packages || !Array.isArray(packages)) {
-      console.warn(`No "packages" field found in ${workspaceFilePath}`);
-      return undefined;
-    }
-
-    return packages;
-  } catch (err) {
-    if (err.code === 'ENOENT') {
-      console.warn(`File ${workspaceFilePath} not found.`);
-      return undefined;
-    }
-    throw err;
-  }
-}
 
 async function getWorkspaces(workspaceRoot) {
   const workspaces = await findWorkspacePackages(workspaceRoot);

@@ -281,12 +281,25 @@ async function start() {
     await lockfile.writeWantedLockfile(isolateFolder, prunedLockFile);
   }
 
+  function copyMetaFiles() {
+    const metaFiles = [
+      '.pnpmfile.cjs', // Required for pnpm validation; must be copied to the isolated workspace if present.
+    ];
+    metaFiles.forEach(file => {
+      const filePath = path.join(rootDir, file);
+      if (fs.existsSync(filePath)) {
+        fse.copySync(filePath, path.join(isolateFolder, file), { preserveTimestamps: true });
+      }
+    });
+  }
+
   createDestinationFolders();
   resolveWorkspacesNewLocation();
   copySrcLessToNewLocation();
   copySrcLessProdToNewLocation();
   createMainJsonFile();
   createWorkspaceYaml();
+  copyMetaFiles();
   await createPnpmLock();
 }
 
